@@ -4,32 +4,40 @@ import requests
 st.title("📄 RAG Chatbot")
 
 uploaded = st.file_uploader("Upload a document")
-
-chunking = st.selectbox(
-    "Chunking strategy",
-    ["fixed", "sentence"]
-)
-
 question = st.text_input("Ask a question")
 
-if st.button("Ask") and uploaded:
-    files = {"file": uploaded}
-    upload_resp = requests.post("http://localhost:8000/upload", files=files).json()
+if uploaded:
+    upload_resp = requests.post(
+        "http://localhost:8000/upload",
+        files={"file": uploaded}
+    ).json()
 
-    chat_resp = requests.post(
+    st.success(
+        f"Uploaded {upload_resp['filename']} "
+        f"({upload_resp['num_chunks']} chunks)"
+    )
+
+    doc_id = upload_resp["document_id"]
+
+if st.button("Ask") and uploaded:
+    resp = requests.post(
         "http://localhost:8000/chat",
         json={
             "question": question,
-            "chunking_strategy": chunking,
-            "context": upload_resp["text"]
+            "document_id": doc_id
         }
-    ).json()
+    )
 
-    st.write("### Answer")
-    st.write(chat_resp["answer"])
+    if resp.status_code != 200:
+        st.error(resp.text)
+    else:
+        chat_resp = resp.json()
+        st.write("### Answer")
+        st.write(chat_resp["answer"])
+        st.write(f"Confidence: {chat_resp['confidence']:.2f}")
 
-    st.write(f"Confidence: {chat_resp['confidence']:.2f}")
+        with st.expander("Sources"):
+            for src in chat_resp["sources"]:
+                st.write(f"**{src['filename']}**")
+                st.write(src["text"][:300])
 
-    with st.expander("Sources"):
-        for src in chat_resp["sources"]:
-            st.write(src["text"][:300])
