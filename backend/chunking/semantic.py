@@ -2,11 +2,7 @@ from backend.utils.embeddings import embed_texts
 import numpy as np
 
 class SemanticChunker:
-    def __init__(self, chunk_size=500, overlap=50):
-        """
-        chunk_size: approx # of words per chunk
-        overlap: how many words overlap between chunks
-        """
+    def __init__(self, chunk_size=200, overlap=75):
         self.chunk_size = chunk_size
         self.overlap = overlap
 
@@ -16,7 +12,9 @@ class SemanticChunker:
         start = 0
         while start < len(words):
             end = min(start + self.chunk_size, len(words))
-            chunk = " ".join(words[start:end])
-            chunks.append(chunk)
+            chunk = " ".join(words[start:end]).strip()
+            if chunk:  # skip empty chunks
+                chunks.append(chunk)
             start += self.chunk_size - self.overlap
         return chunks
+
