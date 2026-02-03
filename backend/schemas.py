@@ -1,17 +1,23 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Union
 
 class ChatRequest(BaseModel):
     question: str
-    document_id: Optional[str] = None  # None = search all docs
+    document_id: str
+    chunking_strategy: Union[str, List[str]] = "fixed"
 
 class SourceChunk(BaseModel):
     text: str
     score: float
     doc_id: str
     filename: str
+    chunking_strategy: str
 
-class ChatResponse(BaseModel):
+class StrategyResult(BaseModel):
+    strategy: str
     answer: str
     confidence: float
     sources: List[SourceChunk]
+
+class ChatResponse(BaseModel):
+    results: List[StrategyResult]

@@ -8,8 +8,11 @@ import uuid
 
 router = APIRouter()
 
+# define all strategies to pre-compute
+ALL_STRATEGIES = ["fixed", "sentence", "semantic"]
+
 @router.post("/upload")
-async def upload(file: UploadFile, chunking_strategy: str = Form("fixed")):
+async def upload(file: UploadFile):
     doc_id = str(uuid.uuid4())
     path = f"/tmp/{doc_id}_{file.filename}"
 
@@ -21,28 +24,31 @@ async def upload(file: UploadFile, chunking_strategy: str = Form("fixed")):
     else:
         text = parse_txt(path)
 
-    # get chosen chunker
-    chunker = get_chunker(chunking_strategy)
-    chunks = chunker.chunk(text)
+    strategy_info = {}
 
-    embeddings = embed_texts(chunks)
+    for strategy in ALL_STRATEGIES:
+        chunker = get_chunker(strategy)
+        chunks = chunker.chunk(text)
+        embeddings = embed_texts(chunks)
 
-    metadatas = [
-        {
-            "doc_id": doc_id,
-            "filename": file.filename,
-            "chunk_id": i,
-            "chunking_strategy": chunking_strategy
-        }
-        for i in range(len(chunks))
-    ]
+        metadatas = [
+            {
+                "doc_id": doc_id,
+                "filename": file.filename,
+                "chunk_id": i,
+                "chunking_strategy": strategy
+            }
+            for i in range(len(chunks))
+        ]
 
-    vector_store.add(embeddings, chunks, metadatas)
+        vector_store.add(embeddings, chunks, metadatas)
+        strategy_info[strategy] = len(chunks)
+
+    # add document to store
     doc_store.add(doc_id, file.filename)
 
     return {
         "document_id": doc_id,
-        "num_chunks": len(chunks),
         "filename": file.filename,
-        "chunking_strategy": chunking_strategy
+        "chunks_per_strategy": strategy_info
     }
