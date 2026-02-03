@@ -32,3 +32,5 @@ class FaissStore:
                 break
 
         return results
+
+vector_store = FaissStore(dim=1536)

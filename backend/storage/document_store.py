@@ -12,3 +12,5 @@ class DocumentStore:
 
     def list_docs(self):
         return self.documents
+
+doc_store = DocumentStore()

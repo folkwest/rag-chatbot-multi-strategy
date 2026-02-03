@@ -1,18 +1,15 @@
-import uuid
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, UploadFile, Form
+from backend.chunking import get_chunker
 from backend.utils.parsing import parse_pdf, parse_txt
-from backend.chunking.fixed import FixedChunker
 from backend.utils.embeddings import embed_texts
-from backend.vectorstore.faiss_store import FaissStore
-from backend.storage.document_store import DocumentStore
+from backend.vectorstore.faiss_store import vector_store
+from backend.storage.document_store import doc_store
+import uuid
 
 router = APIRouter()
 
-vector_store = FaissStore(dim=1536)
-doc_store = DocumentStore()
-
 @router.post("/upload")
-async def upload(file: UploadFile):
+async def upload(file: UploadFile, chunking_strategy: str = Form("fixed")):
     doc_id = str(uuid.uuid4())
     path = f"/tmp/{doc_id}_{file.filename}"
 
@@ -24,15 +21,18 @@ async def upload(file: UploadFile):
     else:
         text = parse_txt(path)
 
-    chunker = FixedChunker()
+    # get chosen chunker
+    chunker = get_chunker(chunking_strategy)
     chunks = chunker.chunk(text)
+
     embeddings = embed_texts(chunks)
 
     metadatas = [
         {
             "doc_id": doc_id,
             "filename": file.filename,
-            "chunk_id": i
+            "chunk_id": i,
+            "chunking_strategy": chunking_strategy
         }
         for i in range(len(chunks))
     ]
@@ -43,5 +43,6 @@ async def upload(file: UploadFile):
     return {
         "document_id": doc_id,
         "num_chunks": len(chunks),
-        "filename": file.filename
+        "filename": file.filename,
+        "chunking_strategy": chunking_strategy
     }
