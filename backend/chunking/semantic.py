@@ -7,14 +7,17 @@ class SemanticChunker:
         self.overlap = overlap
 
     def chunk(self, text: str):
+        # clean text
+        text = text.replace("\n", " ").replace("\r", " ").strip()
         words = text.split()
         chunks = []
         start = 0
         while start < len(words):
             end = min(start + self.chunk_size, len(words))
             chunk = " ".join(words[start:end]).strip()
-            if chunk:  # skip empty chunks
+            if chunk:
                 chunks.append(chunk)
             start += self.chunk_size - self.overlap
+        # debug log
+        print(f"SemanticChunker produced {len(chunks)} chunks")
         return chunks
-

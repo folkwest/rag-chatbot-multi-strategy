@@ -6,7 +6,7 @@ def run_rag(question, vector_store, document_id=None, chunking_strategy=None):
 
     retrieved = vector_store.search(
         query_embedding,
-        top_k=5,
+        top_k=10,
         doc_id=document_id
     )
 

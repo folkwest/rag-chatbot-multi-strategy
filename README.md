@@ -1,6 +1,29 @@
 # RAG Chatbot with Multi-Strategy Chunking
 
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-%2300BAFF?style=for-the-badge&logo=streamlit&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-API-black?style=for-the-badge&logo=openai&logoColor=white)
+![FAISS](https://img.shields.io/badge/FAISS-vector%20store-lightgrey)
+
+
 This is a **Retrieval-Augmented Generation (RAG) chatbot** that allows users to upload documents (PDF/TXT), select different **chunking strategies**, and ask questions about the content. The system supports **multi-document storage**, **confidence scoring**, and **strategy comparison** (fixed, sentence, semantic chunking).
+
+
+![Demo](assets/demo_gif_rag_chatbot.gif)
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Running the project](#running-the-project)
+- [How to use](#how-to-use)
+- [Notes](#notes)
+- [Next Improvements](#next-improvements)
+- [License](#license)
+
 
 ---
 
