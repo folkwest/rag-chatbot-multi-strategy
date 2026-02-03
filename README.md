@@ -35,6 +35,8 @@ pip install -r requirements.txt
 echo "OPENAI_API_KEY=your_key_here" > .env
 ```
 
+---
+
 ## Running the project
 1. Starting the backend (FastAPI)
 ```bash
@@ -44,6 +46,8 @@ uvicorn backend.main:app --reload
 ```bash
 streamlit run frontend/app.py
 ```
+
+---
 
 ## How to use
 
@@ -57,6 +61,8 @@ streamlit run frontend/app.py
 
 - Repeat with multiple documents to compare strategies or combine knowledge.
 
+---
+
 ## Notes
 - Semantic chunking now uses **smaller, overlapping word windows** for better retrieval.
 
@@ -66,3 +72,17 @@ streamlit run frontend/app.py
 
 - Multi-document support is built-in - you can query one document at a time or extend to multiple.
 
+---
+
+## Next Improvements
+- Persist FAISS vector store to disk for long-term storage
+
+- Add side-by-side UI comparison cards
+
+- Enhance semantic chunking using embedding clustering
+
+---
+
+## License
+MIT License
+Feel free to use and modify!
